@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Lame Game</title>
+
+<script>
+'use strict';
+
+if (!String.prototype.format) {
+  String.prototype.format = function() {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function(match, number) { 
+      return typeof args[number] != 'undefined'
+        ? args[number]
+        : match
+      ;
+    });
+  };
+}
+
+class Game {
+  constructor() {
+    this.levels = new Array();
+    this.levels.push(0);
+  }
+  draw() {
+    let buttons = new Array(this.levels.length);
+    for (let i = 0; i < this.levels.length; i++) {
+      buttons[i] = "<input type='button' value='{0}' onClick='register({1})' />".format(this.levels[i],i);
+    }
+    document.getElementById("playfield").innerHTML = buttons.join('');
+  }
+  register(level) {
+    if (level == 0) {
+      this.levels[level]++;
+    } else {
+      const lastLevel = level - 1;
+      if (this.levels[lastLevel] < 10) return;
+
+      this.levels[lastLevel] -= 10;
+      this.levels[level]++;
+    }
+
+    if (this.levels[this.levels.length - 1] == 10) this.levels.push(0);
+
+    this.draw();
+  }
+};
+
+const game = new Game();
+
+function register(level) {
+  if (level < 0 || level >= game.levels.length) throw level;
+
+  game.register(level);
+}
+</script>
+</head>
+
+<body>
+<h1>Lame Game the Game&trade;</h1>
+<div id="playfield">
+<input type='button' value='0' onClick='register(0)' />
+</div>
+</body>
+</html>
