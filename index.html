@@ -7,27 +7,20 @@
 <script>
 'use strict';
 
-if (!String.prototype.format) {
-  String.prototype.format = function() {
-    var args = arguments;
-    return this.replace(/{(\d+)}/g, function(match, number) { 
-      return typeof args[number] != 'undefined'
-        ? args[number]
-        : match
-      ;
-    });
-  };
-}
-
 class Game {
   constructor() {
     this.levels = new Array();
     this.levels.push(0);
   }
+  static makeButton(value,index) {
+    return ["<input type='button'value='",
+            value, "'onClick='register(", index,
+            ")'/>"].join('');
+  }
   draw() {
     let buttons = new Array(this.levels.length);
     for (let i = 0; i < this.levels.length; i++) {
-      buttons[i] = "<input type='button' value='{0}' onClick='register({1})' />".format(this.levels[i],i);
+      buttons[i] = Game.makeButton(this.levels[i],i);
     }
     document.getElementById("playfield").innerHTML = buttons.join('');
   }
