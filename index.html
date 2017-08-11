@@ -9,13 +9,22 @@
 
 class Game {
   constructor() {
-    this.levels = new Array();
-    this.levels.push(0);
+    const savedLevels = localStorage.getItem('savedLevels');
+
+    if(!savedLevels) {
+      this.levels = new Array();
+      this.levels.push(0);
+    } else {
+      this.levels = JSON.parse(savedLevels);
+    }
   }
   static makeButton(value,index) {
     return ["<input type='button'value='",
             value, "'onClick='register(", index,
             ")'/>"].join('');
+  }
+  save() {
+    localStorage.setItem('savedLevels',JSON.stringify(this.levels));
   }
   draw() {
     let buttons = new Array(this.levels.length);
@@ -38,10 +47,15 @@ class Game {
     if (this.levels[this.levels.length - 1] == 10) this.levels.push(0);
 
     this.draw();
+    this.save();
   }
 };
 
 const game = new Game();
+
+window.onload = function() {
+  game.draw();
+};
 
 function register(level) {
   if (level < 0 || level >= game.levels.length) throw level;
@@ -53,8 +67,6 @@ function register(level) {
 
 <body>
 <h1>Lame Game the Game&trade;</h1>
-<div id="playfield">
-<input type='button' value='0' onClick='register(0)' />
-</div>
+<div id="playfield"></div>
 </body>
 </html>
