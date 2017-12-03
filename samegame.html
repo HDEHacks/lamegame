@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Incremental Game</title>
+<style>
+.button {
+	background-color:gray;
+	color:white;
+	border:none;
+	text-align:center;
+	vertical-align:center;
+	text-decoration:none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor:pointer;
+	height:50px;
+	width:50px;
+	margin-right:5px;
+	margin-bottom:5px;
+}
+</style>
+<script>
+"use strict";
+class Game {
+  constructor() {
+    this.levels = new Array();
+    this.levels.push([0,0]);
+  }
+  static makeRow(value, level, isLast) {
+    return `<input type="button" class="button" value="${value[0]}" style="float:left" onClick="register(${level},false)">`
+           + (isLast ? "" : `<input type="button" class="button" value="${value[1]}" onClick="register(${level},true)">`);
+  }
+  draw() {
+    let buttons = new Array(this.levels.length);
+    for (let i = 0; i < this.levels.length; i++) {
+      buttons[i] = Game.makeRow(this.levels[i], i, i==this.levels.length);
+    }
+    document.getElementById("playfield").innerHTML = buttons.join('');
+  }
+  register(level, isAuto) {
+    if (!isAuto) {
+      if (level === 0) {
+        this.levels[level][0]++;
+      } else {
+        const lastLevel = level - 1;
+        if (this.levels[lastLevel][0] < 10) return;
+        this.levels[lastLevel][0] -= 10;
+        this.levels[level][0]++;
+      }
+      if (this.levels[this.levels.length - 1][0] === 10) this.levels.push([0,0]);
+    } else {
+      const nextLevel = level + 1;
+      const lastLevel = level - 1;
+      if (nextLevel >= this.levels.length) return;
+      if (this.levels[nextLevel][0] < 10) return;
+      if (lastLevel >= 0 && ((this.levels[level][1] + 1) * 10) > this.levels[lastLevel][1]) return;
+      this.levels[nextLevel][0] -= 10;
+      this.levels[level][1]++;
+    }
+
+  this.draw();
+  }
+  update() {
+  const len = this.levels.length;
+
+  if (this.levels[0][1] > 0) this.levels[0][0] += this.levels[0][1];
+
+  for (let i = 1; i < len; i++) {
+    if (this.levels[i][1] > 0) {
+      const maxTake = this.levels[i][1] * 10;
+      const lastInventory = this.levels[i - 1][0];
+
+      if (lastInventory >= maxTake) {
+        this.levels[i][0] += this.levels[i][1];
+        this.levels[i - 1][0] -= maxTake;
+      } else {
+        const toTake = this.levels[i - 1][0] - (this.levels[i - 1][0] % 10);
+
+        this.levels[i][0] += toTake / 10;
+        this.levels[i - 1][0] -= toTake;
+      }
+    }
+  }
+  
+  this.draw();
+  setTimeout(function(){game.update();},1000);
+  }
+}
+
+const game = new Game();
+
+window.onload = function() {
+  game.draw();
+  setTimeout(function(){game.update()},1000);
+};
+
+function register(level, isAuto) {
+  if (level < 0 || level >= game.levels.length) throw level;
+  if (!(isAuto === true || isAuto === false)) throw isAuto;
+
+  game.register(level, isAuto);
+}
+</script>
+</head>
+
+<body>
+<h1>Incremental Game</h1>
+<div id="playfield"></div>
+</body>
+</html>
