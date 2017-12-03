@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Incremental Game</title>
 <style>
@@ -25,17 +26,29 @@
 "use strict";
 class Game {
   constructor() {
-    this.levels = new Array();
-    this.levels.push([0,0]);
+    const savedLevels = localStorage.getItem('savedLevels');
+
+    if (!savedLevels) {
+      this.levels = new Array();
+      this.levels.push([0,0]);
+    } else {
+      this.levels = JSON.parse(savedLevels);
+    }
   }
-  static makeRow(value, level, isLast) {
-    return `<input type="button" class="button" value="${value[0]}" style="float:left" onClick="register(${level},false)">`
-           + (isLast ? "" : `<input type="button" class="button" value="${value[1]}" onClick="register(${level},true)">`);
+  save() {
+    localStorage.setItem('savedLevels',JSON.stringify(this.levels));
+  }
+  static makeRow(value, level, isLast, length) {
+    return `<input type="button" class="button" value="${value[0]}" ${length < 3 ? `` : `style="float:left"`} onClick="register(${level},false)">` +
+           ((isLast || length < 3)
+            ? "" : `<input type="button" class="button" value="${value[1]}" onClick="register(${level},true)">`);
   }
   draw() {
     let buttons = new Array(this.levels.length);
-    for (let i = 0; i < this.levels.length; i++) {
-      buttons[i] = Game.makeRow(this.levels[i], i, i==this.levels.length);
+    const len = this.levels.length;
+
+    for (let i = 0; i < len; i++) {
+      buttons[i] = Game.makeRow(this.levels[i], i, i==(len-1), len);
     }
     document.getElementById("playfield").innerHTML = buttons.join('');
   }
@@ -61,6 +74,7 @@ class Game {
     }
 
   this.draw();
+  this.save();
   }
   update() {
   const len = this.levels.length;
@@ -85,6 +99,7 @@ class Game {
   }
   
   this.draw();
+  this.save();
   setTimeout(function(){game.update();},1000);
   }
 }
