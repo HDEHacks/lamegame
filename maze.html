@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<style>
+		body{
+			background-color:grey;
+			color:white;}
+	</style>
+</head>
+<body>
+	<canvas id="cv" height="398" width="398"></canvas>
+
+	Difficulty: <input id="diff" type="range" min="10" max="140" step="1" value="80"
+		oninput="difficultyslider(value)" onmouseup="this.blur()"/>
+	<script>
+		"use strict";
+
+		let ctx;
+
+		const winx = 18;
+		const winy = 18;
+		const width = 20;
+		const h = 20;
+		const w = 20;
+		const beginx = 2;
+		const beginy = 2;
+		let difficulty = 80;
+
+		let playerx = beginx;
+		let playery = beginy;
+		let velocityx = 0;
+		let velocityy = 0;
+		let blocks = [];
+
+		function generate() {
+			let randomIntFromInterval = (min,max) => Math.floor(Math.random()*(max-min+1)+min);
+			let flip = () => randomIntFromInterval(0,1);
+			let last = (arr) => arr[arr.length - 1];
+
+			playerx = beginx;
+			playery = beginy;
+			blocks = [];
+			for (let i = 0; i < h; i++) {
+				blocks.push({x:i,y:0});
+				blocks.push({x:0,y:i});
+				blocks.push({x:i,y:19});
+				blocks.push({x:19,y:i});
+			}
+
+			let path = [{x:beginx,y:beginy}];
+
+			do { // ensure a path exists
+				switch(flip()) {
+					case 0:
+						path.push({x:last(path).x + 1,y:last(path).y});
+						break;
+					case 1:
+						path.push({x:last(path).x,y:last(path).y + 1});
+						break;
+				}
+			} while(last(path).x < winx && last(path).y < winy);
+
+			while(last(path).x < winx) {
+				path.push({x:last(path).x + 1,y:last(path).y});
+			}
+
+			while(last(path).y < winy) {
+				path.push({x:last(path).x,y:last(path).y + 1});
+			}
+
+			let notpath = [];
+
+			do {
+				let mx = randomIntFromInterval(1,winx);
+				let my = randomIntFromInterval(1,winy);
+			    const ispresent = (element) => element.x === mx && element.y === my;
+
+				if (path.some(ispresent) || notpath.some(ispresent)) {
+					continue;
+				} else {
+					notpath.push({x:mx, y:my});
+				}
+
+			} while (notpath.length < difficulty);
+
+			for (let i = 0; i < h; i++) {
+				blocks.push({x:i,y:0});
+				blocks.push({x:0,y:i});
+				blocks.push({x:i,y:19});
+				blocks.push({x:19,y:i});
+			}
+
+			for (let i = 0 ; i < notpath.length; i++) {
+				blocks.push(notpath[i])
+			}
+	    }
+
+	    function difficultyslider(value) {
+	    	difficulty = value;
+	    	generate();
+	    }
+
+		function tick() {
+			move();
+			draw();
+		}
+		function move() {
+			playerx += velocityx;
+			playery += velocityy;
+
+			if(playerx < 0) {
+				playerx = 0
+			} else if (playerx > 19) {
+				playerx = 19
+			} else if (playery < 0) {
+				playery = 0
+			} else if (playery > 19) {
+				playery = 19
+			}
+
+			for (let i = 0; i < blocks.length; i++) {
+				if ((playerx === blocks[i].x) && (playery === blocks[i].y)) {
+					playerx -= velocityx;
+					playery -= velocityy;
+					break;
+				}
+			}
+
+			if (playerx === winx && playery === winy) {
+				generate();
+			}
+
+			velocityx = velocityy = 0;
+		}
+		function draw() {
+			ctx.fillStyle = "grey";
+			ctx.fillRect(0, 0, 398, 398);
+
+			ctx.fillStyle = "red";
+			for (let i = 0; i < blocks.length; i++) {
+				ctx.fillRect(blocks[i].x * width, blocks[i].y * width, width - 2, width - 2);	
+			}
+
+			ctx.fillStyle = "lightblue";
+			ctx.fillRect(playerx * width, playery * width, width - 2, width - 2);
+
+			ctx.fillStyle = "lime";
+			ctx.fillRect(winx * width, winy * width, width - 2, width - 2);
+		}
+		function down(evt) {
+			switch(evt.keyCode){
+				case 37:
+					velocityx = -1; velocityy = 0;
+					break;
+				case 38:
+					velocityx = 0; velocityy = -1;
+					break;
+				case 39:
+					velocityx = 1; velocityy = 0;
+					break;
+				case 40:
+					velocityx = 0; velocityy = 1;
+					break;
+			}
+		}
+
+		window.onload = function() {
+			ctx = document.getElementById("cv").getContext("2d");
+    		document.addEventListener("keypress",down);
+			setInterval(tick,1000/20);
+	    	generate();
+		}
+	</script>
+</body>
+</html>
