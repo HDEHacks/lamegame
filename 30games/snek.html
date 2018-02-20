@@ -107,16 +107,16 @@
 	function down(evt) {
 		switch(evt.keyCode){
 			case 37:
-				if (vx !== 1) vx = -1; vy = 0;
+				if (vx !== 1) {vx = -1; vy = 0;}
 				break;
 			case 38:
-				if (vy !== 1) vx = 0; vy = -1;
+				if (vy !== 1) {vx = 0; vy = -1;}
 				break;
 			case 39:
-				if (vx !== -1) vx = 1; vy = 0;
+				if (vx !== -1) {vx = 1; vy = 0;}
 				break;
 			case 40:
-				if (vy !== -1) vx = 0; vy = 1;
+				if (vy !== -1) {vx = 0; vy = 1;}
 				break;
 		}
 	}
