@@ -30,6 +30,8 @@
 	let py; 
 	let vx; // velocity
 	let vy;
+	let mx; // momentum, where we just moved
+	let my;
 	let ax; // apfel
 	let ay;
 	let snek;
@@ -44,6 +46,8 @@
 	function game() {
 		px += vx;
 		py += vy;
+		mx = vx;
+		my = vy;
 
 		if (px >= w) {
 			px = 0;
@@ -107,16 +111,16 @@
 	function down(evt) {
 		switch(evt.keyCode){
 			case 37:
-				if (vx !== 1) {vx = -1; vy = 0;}
+				if (mx !== 1) {vx = -1; vy = 0;}
 				break;
 			case 38:
-				if (vy !== 1) {vx = 0; vy = -1;}
+				if (my !== 1) {vx = 0; vy = -1;}
 				break;
 			case 39:
-				if (vx !== -1) {vx = 1; vy = 0;}
+				if (mx !== -1) {vx = 1; vy = 0;}
 				break;
 			case 40:
-				if (vy !== -1) {vx = 0; vy = 1;}
+				if (my !== -1) {vx = 0; vy = 1;}
 				break;
 		}
 	}
