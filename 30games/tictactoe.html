@@ -92,16 +92,19 @@ function winning(board, isforAI) {
 			(board[2] === character && board[4] === character && board[6] === character);
 }
 function minimax(board, isAI) {
-	const choices = filteri(board, e => e === "");
-	const player = isAI ? 'O' : 'X';
-
 	if (winning(board, false)) {
 		return {score: -1};
 	} else if (winning(board,true)) {
 		return {score: 1};
-	} else if (choices.length === 0) {
+	}
+	
+	const choices = filteri(board, e => e === "");
+	
+	if (choices.length === 0) {
 		return {score: 0};
 	}
+	
+	const player = isAI ? 'O' : 'X';
 
 	let moves = [];
 
