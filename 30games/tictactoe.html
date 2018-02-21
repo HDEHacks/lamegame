@@ -54,12 +54,6 @@ let spaces = [];
 let stop;
 
 const range = size => Array.from(Array(size).keys());
-const first = (arr,p) => {
-	for (let i = 0; i < arr.length; ++i) {
-		if (p(arr[i])) return i;
-	}
-	return -1;
-}
 const filteri = (arr,p) => range(arr.length).filter(i => p(arr[i]));
 
 function reset() {
