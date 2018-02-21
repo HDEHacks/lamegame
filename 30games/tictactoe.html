@@ -106,7 +106,6 @@ function minimax(board, isAI) {
 	
 	const player = isAI ? 'O' : 'X';
 
-	let moves = [];
 	const moves = choices.map(i => {
 		board[i] = player;
 		const move = {index: i, score: minimax(board,!isAI).score};
