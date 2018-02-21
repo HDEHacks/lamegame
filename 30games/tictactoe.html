@@ -77,7 +77,7 @@ function put(where) {
 }
 function play(board) {
 	const best = minimax(board,true).index;
-	board[ minimax(board,true).index ] = 'O';
+	board[ best ] = 'O';
 }
 const draw = () => range(9).map(i => spaces[i].value = board[i]);
 function winning(board, isforAI) {
