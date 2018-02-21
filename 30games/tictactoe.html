@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+.space {
+	background-color:gray;
+	color:white;
+	border:none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor:pointer;
+	font-size:16px;
+	height:80px;
+	width:80px;
+	margin-right:5px;
+	margin-bottom:5px;
+	float:left;
+}
+#b3, #b6, #b9 {
+	float:none;
+}
+#field {
+	height:250px;
+	width:250px;
+	position:absolute;
+	z-index: -1;
+	background-color: black;
+}
+</style>
+</head>
+
+<body>
+	<h1>Tic-Tac-Woah!</h1>
+	<div id="field">
+	</div>
+	<input type="button" class="space" value="" id="b1" />
+	<input type="button" class="space" value="" id="b2" />
+	<input type="button" class="space" value="" id="b3" />
+	<input type="button" class="space" value="" id="b4" />
+	<input type="button" class="space" value="" id="b5" />
+	<input type="button" class="space" value="" id="b6" />
+	<input type="button" class="space" value="" id="b7" />
+	<input type="button" class="space" value="" id="b8" />
+	<input type="button" class="space" value="" id="b9" />
+	<input type="button" value="Reset" id="reset" />
+<script>
+"use strict";
+
+let board = [];
+let spaces = [];
+let stop;
+
+const range = size => Array.from(Array(size).keys());
+const first = (arr,p) => {
+	for (let i = 0; i < arr.length; ++i) {
+		if (p(arr[i])) return i;
+	}
+	return -1;
+}
+const filteri = (arr,p) => range(arr.length).filter(i => p(arr[i]));
+
+function reset() {
+	board = range(9).map(_ => "");
+	stop = false;
+	draw();
+}
+function put(where) {
+	if(!stop && board[where] === "") {
+		board[where] = 'X';
+		if (!winning(board,false)) {
+			play(board);
+		} else {
+			stop = true;
+		}
+		if (winning(board,true)) {
+			stop = true;
+		}
+		draw();
+	}
+}
+function play(board) {
+	const best = minimax(board,true).index;
+	board[ minimax(board,true).index ] = 'O';
+}
+const draw = () => range(9).map(i => spaces[i].value = board[i]);
+function winning(board, isforAI) {
+	const character = isforAI ? 'O' : 'X';
+	return	(board[0] === character && board[1] === character && board[2] === character) ||
+			(board[3] === character && board[4] === character && board[5] === character) ||
+			(board[6] === character && board[7] === character && board[8] === character) ||
+			(board[0] === character && board[3] === character && board[6] === character) ||
+			(board[1] === character && board[4] === character && board[7] === character) ||
+			(board[2] === character && board[5] === character && board[8] === character) ||
+			(board[0] === character && board[4] === character && board[8] === character) ||
+			(board[2] === character && board[4] === character && board[6] === character);
+}
+function minimax(board, isAI) {
+	const choices = filteri(board, e => e === "");
+	const player = isAI ? 'O' : 'X';
+
+	if (winning(board, false)) {
+		return {score: -1};
+	} else if (winning(board,true)) {
+		return {score: 1};
+	} else if (choices.length === 0) {
+		return {score: 0};
+	}
+
+	let moves = [];
+
+	for (let i = 0; i < choices.length; i++) {
+		let move = {index: undefined, score: undefined};
+		move.index = choices[i];
+
+		board[choices[i]] = player;
+		move.score = minimax(board,!isAI).score;
+		board[choices[i]] = "";
+
+		moves.push(move);
+	}
+
+	let best = moves[0];
+
+	if (isAI) {
+		for (let i = 0; i < moves.length; i++) {
+			if (moves[i].score > best.score) best = moves[i];
+		}
+	} else {
+		for (let i = 0; i < moves.length; i++) {
+			if (moves[i].score < best.score) best = moves[i];
+		}
+	}
+
+	return best;
+}
+window.onload = function() {
+	spaces = range(9).map(i => "b" + (i+1)).map(s => document.getElementById(s));
+
+	range(9).map(i => spaces[i].onclick = () => put(i));
+
+	document.getElementById("reset").onclick = () => reset();
+
+	reset();
+}
+</script>
+</body>
+</html>
